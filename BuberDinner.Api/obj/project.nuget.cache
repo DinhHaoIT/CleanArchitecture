@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "RFrIuVoFDfU=",
+  "success": true,
+  "projectFilePath": "D:\\CleanArchitecture\\Git\\BuberDinner.Api\\BuberDinner.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\dinhh\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.1\\microsoft.extensions.dependencyinjection.abstractions.8.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
