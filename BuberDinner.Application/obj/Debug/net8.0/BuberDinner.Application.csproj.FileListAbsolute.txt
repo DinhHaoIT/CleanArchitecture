@@ -28,3 +28,4 @@ D:\CleanArchitecture\Git\BuberDinner.Application\obj\Debug\net8.0\BuberDinner.Ap
 D:\CleanArchitecture\Git\BuberDinner.Application\obj\Debug\net8.0\refint\BuberDinner.Application.dll
 D:\CleanArchitecture\Git\BuberDinner.Application\obj\Debug\net8.0\BuberDinner.Application.pdb
 D:\CleanArchitecture\Git\BuberDinner.Application\obj\Debug\net8.0\ref\BuberDinner.Application.dll
+D:\CleanArchitecture\Git\BuberDinner.Application\obj\Debug\net8.0\BuberDinner.Application.sourcelink.json
