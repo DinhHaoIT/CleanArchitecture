@@ -1,4 +1,7 @@
-﻿using System;
+﻿using BuberDinner.Application.Commons.Errors;
+using ErrorOr;
+using OneOf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +11,7 @@ namespace BuberDinner.Application.Services.Authentication
 {
     public interface IAuthenticationService
     {
-        AuthenticationResult Login(string Email, string Password);
-        AuthenticationResult Register(string FirstName, string LastName, string Email, string Password);
+        ErrorOr<AuthenticationResult> Login(string Email, string Password);
+        ErrorOr<AuthenticationResult> Register(string FirstName, string LastName, string Email, string Password);
     }
 }
