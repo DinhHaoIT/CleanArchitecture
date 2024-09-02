@@ -1,9 +1,10 @@
-﻿using BuberDinner.Api.Filters;
-using BuberDinner.Application.Services.Authentication;
+﻿using BuberDinner.Application.Authentication.Commands.Register;
+using BuberDinner.Application.Authentication.Commons;
+using BuberDinner.Application.Authentication.Queries.Login;
 using BuberDinner.Contract.Authentication;
 using BuberDinner.Domain.Common.Errors;
 using ErrorOr;
-using Microsoft.AspNetCore.Http;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -14,53 +15,46 @@ namespace BuberDinner.Api.Controllers
     //[ErrorHandlingFilter]
     public class AuthenticationController : ApiController
     {
-        private readonly IAuthenticationService _authenticationService;
-        public AuthenticationController(IAuthenticationService authenticationService)
+        private readonly ISender _mediator;
+
+        public AuthenticationController(ISender mediator)
         {
-            _authenticationService = authenticationService;
+            _mediator = mediator;
         }
+
         [HttpPost("register")]
-        public IActionResult Register(RegisterRequestContract register)
+        public async Task<IActionResult> Register(RegisterRequestContract registerModel)
         {
-            var registerResult = _authenticationService.Register(register.FirstName, register.LastName, register.Email, register.Password);
+            var command = new RegisterCommand(
+                registerModel.FirstName, 
+                registerModel.LastName, 
+                registerModel.Email, 
+                registerModel.Password
+            );
+            var registerResult = await _mediator.Send(command);
 
             return registerResult.Match(
                 result => Ok(MapAuthResult(result)),
                 errs => Problem(errs)
             );
-            //return registerResult.Match(
-            //    authResult => Ok(MapAuthResult(authResult)),
-            //    error => Problem(statusCode: (int)error.StatusCode, title:error.Message)
-            //);
-            //if(registerResult.IsT0)
-            //{
-            //    var authResult = registerResult.AsT0;
-            //    var authResponse = new AutResultContract(
-            //       authResult.Id,
-            //       authResult.FirstName,
-            //       authResult.LastName,
-            //       authResult.Email,
-            //       authResult.Token
-            //    );
-            //    return Ok(authResponse);
-            //}
-
-            //return Problem(statusCode:(int) HttpStatusCode.BadRequest,title: "Email already exists");
+            
         }
         private static AutResultContract MapAuthResult(AuthenticationResult authResult)
         {
             return new AutResultContract(
-                authResult.Id,
-                authResult.FirstName,
-                authResult.LastName,
-                authResult.Email,
+                authResult.User.Id,
+                authResult.User.FirstName,
+                authResult.User.LastName,
+                authResult.User.Email,
                 authResult.Token
             );
         }
         [HttpPost("login")]
-        public IActionResult Login(LoginRequestContract login) 
+        public async Task<IActionResult> Login(LoginRequestContract login) 
         {
-            var loginResult = _authenticationService.Login(login.Email, login.Password);
+            var loginQuery = new LoginQuery(login.Email, login.Password);
+            var loginResult = await _mediator.Send(loginQuery);
+            //var loginResult = _autQueryService.Login(login.Email, login.Password);
             if(loginResult.IsError && loginResult.FirstError == Errors.Authentication.InvalidCredentials)
             {
                 return Problem(
@@ -72,14 +66,7 @@ namespace BuberDinner.Api.Controllers
                 result => Ok(MapAuthResult(result)),
                 errs => Problem(errs)
             );
-            //var authResponse = new AutResultContract(
-           //    loginResult.Id,
-           //    loginResult.FirstName,
-           //    loginResult.LastName,
-           //    loginResult.Email,
-           //    loginResult.Token
-           //);
-           // return Ok(authResponse);
+         
         }
     }
 }
