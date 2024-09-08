@@ -4,6 +4,7 @@ using BuberDinner.Application.Authentication.Queries.Login;
 using BuberDinner.Contract.Authentication;
 using BuberDinner.Domain.Common.Errors;
 using ErrorOr;
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -16,25 +17,30 @@ namespace BuberDinner.Api.Controllers
     public class AuthenticationController : ApiController
     {
         private readonly ISender _mediator;
-
-        public AuthenticationController(ISender mediator)
+        private readonly IMapper _mapper;
+        public AuthenticationController(ISender mediator, IMapper mapper)
         {
             _mediator = mediator;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestContract registerModel)
         {
-            var command = new RegisterCommand(
-                registerModel.FirstName, 
-                registerModel.LastName, 
-                registerModel.Email, 
-                registerModel.Password
-            );
+            //var command = new RegisterCommand(
+            //    registerModel.FirstName, 
+            //    registerModel.LastName, 
+            //    registerModel.Email, 
+            //    registerModel.Password
+            //);
+            var command = _mapper.Map<RegisterCommand>(registerModel);
             var registerResult = await _mediator.Send(command);
 
             return registerResult.Match(
-                result => Ok(MapAuthResult(result)),
+                result => Ok(
+                    //MapAuthResult(result)
+                    _mapper.Map<AutResultContract>(result)
+                    ),
                 errs => Problem(errs)
             );
             
@@ -52,7 +58,8 @@ namespace BuberDinner.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestContract login) 
         {
-            var loginQuery = new LoginQuery(login.Email, login.Password);
+            //var loginQuery = new LoginQuery(login.Email, login.Password);
+            var loginQuery = _mapper.Map<LoginQuery>(login);
             var loginResult = await _mediator.Send(loginQuery);
             //var loginResult = _autQueryService.Login(login.Email, login.Password);
             if(loginResult.IsError && loginResult.FirstError == Errors.Authentication.InvalidCredentials)
@@ -63,7 +70,10 @@ namespace BuberDinner.Api.Controllers
                 );
             }
             return loginResult.Match(
-                result => Ok(MapAuthResult(result)),
+                result => Ok(
+                    //MapAuthResult(result)
+                    _mapper.Map<AutResultContract>(result)
+                ),
                 errs => Problem(errs)
             );
          
